@@ -23,12 +23,24 @@ func ScanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ec2Instances, err := aws.FetchEC2Instances()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	rdsInstances, err := aws.FetchRDSInstances()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := struct {
 		EC2Instances []aws.EC2Instance `json:"ec2_instances"`
 		RDSInstances []aws.RDSInstance `json:"rds_instances"`
 	}{
-		EC2Instances: aws.GetEC2Instances(),
-		RDSInstances: aws.GetRDSInstances(),
+		EC2Instances: ec2Instances,
+		RDSInstances: rdsInstances,
 	}
 
 	fmt.Println(response)
